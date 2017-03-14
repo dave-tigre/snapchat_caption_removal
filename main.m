@@ -20,16 +20,13 @@ Simple.pic_edge_bw = im2bw(Simple.pic_edge_gray,0.4);
 % Simple.pic_edge_bw = im2bw(Simple.pic_edge,.2);
 imshow(Simple.pic_edge_bw);
 
-
 % labels = regionprops(Simple_pic_edge,'Area');
 % labels_bw = bwlabel(Simple_pic_edge);
 
 %% Houghline Transform
-bin = im2bw(Simple.pic, 0.5);
-%rotI = imrotate(bin,33,'crop');
-BW = edge(bin,'canny');
-%BW = im2bw(Simple.pic, 0.5);
-[H,T,R] = hough(BW);
+Simple.bw = im2bw(Simple.pic, 0.5);
+Simple.bw_edge = edge(Simple.bw,'canny');
+[H,T,R] = hough(Simple.bw_edge);
 
 % imshow(H,[],'XData',T,'YData',R,...
 %             'InitialMagnification','fit');
@@ -42,14 +39,22 @@ x = T(P(:,2)); y = R(P(:,1));
 % plot(x,y,'s','color','white');
 
 
-lines = houghlines(BW,T,R,P,'FillGap',5,'MinLength',30);
-figure, imshow(Simple.pic), hold on
+lines = houghlines(Simple.bw_edge,T,R,P,'FillGap',5,'MinLength',30);
+figure; h1 = imshow(Simple.pic); hold on;
 max_len = 0;
+snaplines_y = [];
 
 for k = 1:length(lines)
+    
+    if lines(k).theta ~= -90 % Added this to cancel out and non horizontal lines
+       continue; 
+    end
+    
    xy = [lines(k).point1; lines(k).point2];
     xy(2,1)=750;
+    xy(1,1) = 0;
    plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
+   snaplines_y(length(snaplines_y)+1) = lines(k).point2(2);
 
    % Plot beginnings and ends of lines
 %    plot(xy(1,1),xy(1,2),'x','LineWidth',2,'Color','yellow');
@@ -62,5 +67,12 @@ for k = 1:length(lines)
       xy_long = xy;
    end
 end
+
+Simple.pic_adjusted = Simple.pic;
+for t = snaplines_y(2):snaplines_y(1)
+    Simple.pic_adjusted(t,:,:) = Simple.pic(t,:,:) + 15;
+end
+figure;
+imshow(Simple.pic_adjusted);
 % hold on 
 % plot(xy_long(:,1),xy_long(:,2),'LineWidth',2,'Color','cyan');
