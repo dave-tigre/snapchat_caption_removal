@@ -20,9 +20,6 @@ Simple.pic_edge_bw = im2bw(Simple.pic_edge_gray,0.4);
 % Simple.pic_edge_bw = im2bw(Simple.pic_edge,.2);
 imshow(Simple.pic_edge_bw);
 
-% labels = regionprops(Simple_pic_edge,'Area');
-% labels_bw = bwlabel(Simple_pic_edge);
-
 %% Houghline Transform
 Simple.bw = im2bw(Simple.pic, 0.5);
 Simple.bw_edge = edge(Simple.bw,'canny');
@@ -53,7 +50,7 @@ for k = 1:length(lines)
    xy = [lines(k).point1; lines(k).point2];
     xy(2,1)=750;
     xy(1,1) = 0;
-   plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
+%    plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
    snaplines_y(length(snaplines_y)+1) = lines(k).point2(2);
 
    % Plot beginnings and ends of lines
@@ -68,11 +65,43 @@ for k = 1:length(lines)
    end
 end
 
+
 Simple.pic_adjusted = Simple.pic;
+R_adj = [];
+G_adj = [];
+B_adj = [];
+
+% Take random pixels from above and below the snap bar and averages them to
+% increase the intensity of part with the bar
+col_num = ceil(rand(1,5)*size(Simple.pic,2)+1)-1;
+row_num = ceil(rand(1,5)*5+1)-1 + snaplines_y(1);
+row_num_bar = ceil(rand(1,5)*(abs(diff(snaplines_y)))+1)-1 + snaplines_y(2);
+
+
+R_adj = Simple.pic(row_num,col_num,1) - Simple.pic(row_num_bar,col_num,1);
+G_adj = Simple.pic(row_num,col_num,2) - Simple.pic(row_num_bar,col_num,2);
+B_adj = Simple.pic(row_num,col_num,3) - Simple.pic(row_num_bar,col_num,3);
+
+R_adj_scale = round(mean(R_adj));
+R_adj_scale = round(mean(R_adj_scale));
+G_adj_scale = round(mean(G_adj));
+G_adj_scale = round(mean(G_adj_scale));
+B_adj_scale = round(mean(B_adj));
+B_adj_scale = round(mean(B_adj_scale));
+
+        
 for t = snaplines_y(2):snaplines_y(1)
-    Simple.pic_adjusted(t,:,:) = Simple.pic(t,:,:) + 15;
+    if t == snaplines_y(2) || t == snaplines_y(1)
+        Simple.pic_adjusted(t,:,1) = Simple.pic(t,:,1) + round(R_adj_scale/2);
+        Simple.pic_adjusted(t,:,2) = Simple.pic(t,:,2) + round(G_adj_scale/2);
+        Simple.pic_adjusted(t,:,3) = Simple.pic(t,:,3) + round(B_adj_scale/2);
+        continue;
+    end
+    Simple.pic_adjusted(t,:,1) = Simple.pic(t,:,1) + R_adj_scale;
+    Simple.pic_adjusted(t,:,2) = Simple.pic(t,:,2) + G_adj_scale;
+    Simple.pic_adjusted(t,:,3) = Simple.pic(t,:,3) + B_adj_scale;
 end
+
 figure;
 imshow(Simple.pic_adjusted);
-% hold on 
-% plot(xy_long(:,1),xy_long(:,2),'LineWidth',2,'Color','cyan');
+title('Adjusted Picture to try and take care of the caption Bar');
