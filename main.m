@@ -4,7 +4,8 @@
 clc; clear; close all;
 
 %% Project Code 
-Simple.pic = imread('Simple.JPG');
+% Simple.pic = imread('Simple.JPG');
+Simple.pic = imread('desk.jpeg');
 
 figure;
 subplot(1,2,1);
@@ -36,7 +37,7 @@ x = T(P(:,2)); y = R(P(:,1));
 % plot(x,y,'s','color','white');
 
 
-lines = houghlines(Simple.bw_edge,T,R,P,'FillGap',5,'MinLength',30);
+lines = houghlines(Simple.bw_edge,T,R,P,'FillGap',5,'MinLength',300);
 figure; h1 = imshow(Simple.pic); hold on;
 max_len = 0;
 snaplines_y = [];
@@ -50,7 +51,7 @@ for k = 1:length(lines)
    xy = [lines(k).point1; lines(k).point2];
     xy(2,1)=750;
     xy(1,1) = 0;
-%    plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
+   plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
    snaplines_y(length(snaplines_y)+1) = lines(k).point2(2);
 
    % Plot beginnings and ends of lines
@@ -58,11 +59,11 @@ for k = 1:length(lines)
 %    plot(xy(2,1),xy(2,2),'x','LineWidth',2,'Color','red');
 
    % Determine the endpoints of the longest line segment
-   len = norm(lines(k).point1 - lines(k).point2);
-   if ( len > max_len)
-      max_len = len;
-      xy_long = xy;
-   end
+% %    len = norm(lines(k).point1 - lines(k).point2);
+% %    if ( len > max_len)
+% %       max_len = len;
+% %       xy_long = xy;
+% %    end
 end
 
 
@@ -83,15 +84,15 @@ G_adj = Simple.pic(row_num,col_num,2) - Simple.pic(row_num_bar,col_num,2);
 B_adj = Simple.pic(row_num,col_num,3) - Simple.pic(row_num_bar,col_num,3);
 
 R_adj_scale = round(mean(R_adj));
-R_adj_scale = round(mean(R_adj_scale));
-G_adj_scale = round(mean(G_adj));
+R_adj_scale = round(mean(R_adj_scale)); % I Had to do all these twice for it
+G_adj_scale = round(mean(G_adj));       % to actually take the mean idk why.
 G_adj_scale = round(mean(G_adj_scale));
 B_adj_scale = round(mean(B_adj));
 B_adj_scale = round(mean(B_adj_scale));
 
         
 for t = snaplines_y(2):snaplines_y(1)
-    if t == snaplines_y(2) || t == snaplines_y(1)
+    if t == snaplines_y(2) || t == snaplines_y(1) % The borders of the bar aren't faded as much
         Simple.pic_adjusted(t,:,1) = Simple.pic(t,:,1) + round(R_adj_scale/2);
         Simple.pic_adjusted(t,:,2) = Simple.pic(t,:,2) + round(G_adj_scale/2);
         Simple.pic_adjusted(t,:,3) = Simple.pic(t,:,3) + round(B_adj_scale/2);
@@ -102,6 +103,6 @@ for t = snaplines_y(2):snaplines_y(1)
     Simple.pic_adjusted(t,:,3) = Simple.pic(t,:,3) + B_adj_scale;
 end
 
-figure;
+figure; % Plot adjusted picture
 imshow(Simple.pic_adjusted);
 title('Adjusted Picture to try and take care of the caption Bar');
