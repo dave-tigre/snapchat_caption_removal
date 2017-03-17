@@ -5,7 +5,7 @@ clc; clear; close all;
 
 %% Project Code 
 % testImage.pic = imread('Simple.JPG');
-testImage = imread('desk.jpeg');
+testImage = imread('Simple.JPG');
 
 imshow(testImage)
 title('Original Image');
@@ -131,36 +131,75 @@ right_x = max_x + diff_x;
 diff_y = (max_y - min_y);
 mid_y = min_y + diff_y;
 
-ro_x = [min_x max_x right_x max_x min_x left_x]
-ro_y = [min_y min_y mid_y max_y max_y mid_y]
+ro_x = [min_x max_x right_x max_x min_x left_x];
+ro_y = [min_y min_y mid_y max_y max_y mid_y];
 
 testImage_gray = rgb2gray(testImage);
 J = regionfill(testImage_gray,ro_x,ro_y);
 figure
 imshow(J)
 
-rgbTest = gray2rgb(J);
+testImage_noText = gray2rgb(J);
 
-rgbTest = im2uint8(rgbTest);
+testImage_noText = im2uint8(testImage_noText);
 
 % change the rgb values of the gray image image to be same as original
 % except for what was in the caption bar
-[ROW COL RGB] = size(testImage)
+[ROW COL RGB] = size(testImage);
 for i = 1:ROW
     for j = 1:COL
         
-        if (not(and(i > snaplines_y(2), i < snaplines_y(1))))
+        if (not(and(i > min_y, i < max_y) && (and(j > left_x, j < right_x))) )
             for c = 1:RGB
-            rgbTest(i,j,c) = testImage(i,j,c);
-            end
+                testImage_noText(i,j,c) = testImage(i,j,c);
+            end     
         end
         
     end
 end
 
 figure()
-imshow(rgbTest)
+imshow(testImage_noText)
 title('Image with text removed')
 
+%% Removal of Caption Bar
+
+testImage_adjusted = testImage_noText;
+R_adj = [];
+G_adj = [];
+B_adj = [];
+
+% Take random pixels from above and below the snap bar and averages them to
+% increase the intensity of part with the bar
+col_num = ceil(rand(1,5)*size(testImage_noText,2)+1)-1;
+row_num = ceil(rand(1,5)*5+1)-1 + snaplines_y(1);
+row_num_bar = ceil(rand(1,5)*(abs(diff(snaplines_y)))+1)-1 + snaplines_y(2);
 
 
+R_adj = testImage_noText(row_num,col_num,1) - testImage_noText(row_num_bar,col_num,1);
+G_adj = testImage_noText(row_num,col_num,2) - testImage_noText(row_num_bar,col_num,2);
+B_adj = testImage_noText(row_num,col_num,3) - testImage_noText(row_num_bar,col_num,3);
+
+R_adj_scale = round(mean(R_adj));
+R_adj_scale = round(mean(R_adj_scale)); % I Had to do all these twice for it
+G_adj_scale = round(mean(G_adj));       % to actually take the mean idk why.
+G_adj_scale = round(mean(G_adj_scale));
+B_adj_scale = round(mean(B_adj));
+B_adj_scale = round(mean(B_adj_scale));
+
+        
+for t = snaplines_y(2):snaplines_y(1)
+    if t == snaplines_y(2) || t == snaplines_y(1) % The borders of the bar aren't faded as much
+        testImage_adjusted(t,:,1) = testImage_noText(t,:,1) + round(R_adj_scale/2);
+        testImage_adjusted(t,:,2) = testImage_noText(t,:,2) + round(G_adj_scale/2);
+        testImage_adjusted(t,:,3) = testImage_noText(t,:,3) + round(B_adj_scale/2);
+        continue;
+    end
+    testImage_adjusted(t,:,1) = testImage_noText(t,:,1) + R_adj_scale;
+    testImage_adjusted(t,:,2) = testImage_noText(t,:,2) + G_adj_scale;
+    testImage_adjusted(t,:,3) = testImage_noText(t,:,3) + B_adj_scale;
+end
+
+figure()
+imshow(testImage_adjusted)
+title('Image with caption bar removed')
