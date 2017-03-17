@@ -82,14 +82,56 @@ max_reg = bw_label;
 [B,L] = bwboundaries(max_reg);
 
 hold on
+max_y = snaplines_y(2);
+min_y = snaplines_y(1);
+max_x = 0;
+min_x = 750;
+
 
 for k = 1:size(B)
    boundary = B{k};
+   
    if(and(boundary(:,1) > snaplines_y(2), boundary(:,1) < snaplines_y(1)) )
         plot(boundary(:,2), boundary(:,1), 'm', 'LineWidth', 1.5)
+        % find highest and lowest y values
+        if( max(boundary(:,1)) > max_y)
+           max_y = max(boundary(:,1));
+        end
+        if(max(boundary(:,1)) < min_y)
+           min_y = max(boundary(:,1));
+        end
+
+        % find highest and lowest x and y values
+        if( max(boundary(:,2)) > max_x)
+           max_x = max(boundary(:,2));
+        end
+        if(max(boundary(:,2)) < min_x)
+           min_x = max(boundary(:,2));
+        end
    end
    
 end
 title('Image with isolated text and caption box')
 
-%% Inpaint the text
+%% Inpaint the text with found values
+fact = 10;
+max_y = max_y+fact;
+min_y = min_y-fact;
+max_x = max_x+fact; 
+min_x = min_x-fact;
+diff_x = (max_x - min_x);
+left_x = min_x - diff_x;
+right_x = max_x + diff_x;
+
+diff_y = (max_y - min_y);
+mid_y = min_y + diff_y;
+
+ro_x = [min_x max_x right_x max_x min_x left_x]
+ro_y = [min_y min_y mid_y max_y max_y mid_y]
+
+I = rgb2gray(testImage);
+J = regionfill(I,ro_x,ro_y);
+figure
+imshow(J)
+title('Image with text removed')
+
