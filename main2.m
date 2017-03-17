@@ -55,17 +55,11 @@ for k = 1:length(lines)
 % %    end
 end
 
-% Focus on textbox area
-box_width = snaplines_y(1) - snaplines_y(2);
-snap_box = imcrop(testImage,[0 snaplines_y(2) 750 box_width]);
-figure()
-imshow(snap_box)
-title('Isolated Caption Box')
+hold on
 
 %% Contrast Adjustment to differentiate text
-snap_box_bw = ~im2bw(snap_box, 0.9);
-figure()
-imshow(snap_box_bw)
+snap_box_bw = ~im2bw(testImage, 0.9);
+
 
 blob_region = regionprops(snap_box_bw,'Area');
 bw_label = bwlabel(snap_box_bw);
@@ -86,11 +80,11 @@ end
 max_reg = bw_label;
 [B,L] = bwboundaries(max_reg);
 
-figure()
-imshow(snap_box);
-title('Highlighted Text and Box')
 hold on
 for k = 1:size(B)
    boundary = B{k};
-   plot(boundary(:,2), boundary(:,1), 'r', 'LineWidth', 1.5)
+   plot(boundary(:,2), boundary(:,1), 'm', 'LineWidth', 1.5)
 end
+title('Image with isolated text and caption box')
+
+%% Inpaint the text
