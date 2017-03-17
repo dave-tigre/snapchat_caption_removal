@@ -8,7 +8,10 @@ clc; clear; close all;
 testImage = imread('desk.jpeg');
 
 imshow(testImage)
-title('Original Image')
+title('Original Image');
+
+
+
 
 %% Houghline Transform to isolate caption box
 
@@ -135,11 +138,27 @@ testImage_gray = rgb2gray(testImage);
 J = regionfill(testImage_gray,ro_x,ro_y);
 figure
 imshow(J)
-[x,map] = rgb2ind(testImage,800);
 
-colorMap=[testImage(:,:,1)' testImage(:,:,2)' testImage(:,:,3)'];
-rgbTest = ind2rgb(J,map);
-figure();
+rgbTest = gray2rgb(J);
+
+rgbTest = im2uint8(rgbTest);
+
+% change the rgb values of the gray image image to be same as original
+% except for what was in the caption bar
+[ROW COL RGB] = size(testImage)
+for i = 1:ROW
+    for j = 1:COL
+        
+        if (not(and(i > snaplines_y(2), i < snaplines_y(1))))
+            for c = 1:RGB
+            rgbTest(i,j,c) = testImage(i,j,c);
+            end
+        end
+        
+    end
+end
+
+figure()
 imshow(rgbTest)
 title('Image with text removed')
 

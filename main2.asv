@@ -8,7 +8,10 @@ clc; clear; close all;
 testImage = imread('desk.jpeg');
 
 imshow(testImage)
-title('Original Image')
+title('Original Image');
+
+
+
 
 %% Houghline Transform to isolate caption box
 
@@ -114,6 +117,8 @@ end
 title('Image with isolated text and caption box')
 
 %% Inpaint the text with found values
+
+% create polygon region to fill
 fact = 10;
 max_y = max_y+fact;
 min_y = min_y-fact;
@@ -133,10 +138,60 @@ testImage_gray = rgb2gray(testImage);
 J = regionfill(testImage_gray,ro_x,ro_y);
 figure
 imshow(J)
-[x,map] = rgb2ind(testImage,800);
-map
-colorMap=[testImage(:,:,1) testImage(:,:,2) testImage(:,:,3)]
-rgbTest = ind2rgb(J,color)
+
+
+[x,map] = rgb2ind(testImage,0.2);
+rgbTest = ind2rgb(J,map);
+figure()
+imshow(rgbTest)
+
+rgbTest = im2uint
+% change the rgb values of the gray image image to be same as original
+[ROW COL RGB] = size(testImage)
+for i = 1:ROW
+    for j = 1:COL
+        for c = 1:RGB
+            rgbTest(i,j,c) = testImage(i,j,c);
+        end
+%         if (not(and(ROW > snaplines_y(2), ROW < snaplines_y(1))))
+%             
+%         end
+        
+    end
+end
+testImage(1334,1,:)
+rgbTest(1334,1,:)
+% 
+% testcolor = testImage(1334,1,:)
+% k7 = im2uint8(t2);
+% testcolor2 = k7(1334,1,:)
+
+% Combinations = [];
+% 
+% [ROW COL RGB] = size(testImage);
+% red = zeros(ROW,COL);
+% blue = zeros(ROW,COL);
+% green = zeros(ROW,COL);
+% for i = 1:ROW
+%     for j = 1:COL
+%         red(i,j) = testImage(i,j,1);
+%         blue(i,j) = testImage(i,j,1);
+%         green(i,j) = testImage(i,j,1);
+%         
+% %         if (not(and(ROW > snaplines_y(2), ROW < snaplines_y(1))))
+% %             
+% %         end
+%         
+%     end
+% end
+% 
+% 
+% 
+% RGBImage = reshape(Combinations, [size(J, 1), size(J, 2), 3]);
+
+figure()
+
+imshow(rgbTest)
 title('Image with text removed')
 
 
