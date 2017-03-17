@@ -82,11 +82,11 @@ max_reg = bw_label;
 [B,L] = bwboundaries(max_reg);
 
 hold on
-j = B;
+
 for k = 1:size(B)
    boundary = B{k};
-   if(boundary(:,1) > snaplines_y(2))
-       plot(boundary(:,2), boundary(:,1), 'm', 'LineWidth', 1.5)
+   if(and(boundary(:,1) > snaplines_y(2), boundary(:,1) < snaplines_y(1)) )
+        plot(boundary(:,2), boundary(:,1), 'm', 'LineWidth', 1.5)
    end
    
 end
