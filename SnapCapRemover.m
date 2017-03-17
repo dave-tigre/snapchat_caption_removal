@@ -5,14 +5,10 @@ clc; clear; close all;
 
 %% Project Code 
 % testImage.pic = imread('Simple.JPG');
-testImage = imread('Simple.JPG');
+testImage = imread('desk.jpeg');
 
 imshow(testImage)
 title('Original Image');
-
-
-
-
 %% Houghline Transform to isolate caption box
 
 testImage_bw = im2bw(testImage, 0.5);
