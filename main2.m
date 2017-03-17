@@ -8,6 +8,7 @@ clc; clear; close all;
 testImage = imread('Simple.JPG');
 
 imshow(testImage)
+title('Original Image')
 
 %% Houghline Transform to isolate caption box
 
@@ -81,9 +82,13 @@ max_reg = bw_label;
 [B,L] = bwboundaries(max_reg);
 
 hold on
+j = B;
 for k = 1:size(B)
    boundary = B{k};
-   plot(boundary(:,2), boundary(:,1), 'm', 'LineWidth', 1.5)
+   if(boundary(:,1) > snaplines_y(2))
+       plot(boundary(:,2), boundary(:,1), 'm', 'LineWidth', 1.5)
+   end
+   
 end
 title('Image with isolated text and caption box')
 
