@@ -5,7 +5,7 @@ clc; clear; close all;
 
 %% Project Code 
 % testImage.pic = imread('Simple.JPG');
-testImage = imread('Simple.JPG');
+testImage = imread('desk.jpeg');
 
 imshow(testImage)
 
@@ -63,7 +63,7 @@ imshow(snap_box)
 title('Isolated Caption Box')
 
 %% Contrast Adjustment to differentiate text
-snap_box_bw = ~im2bw(snap_box, 0.9);
+snap_box_bw = im2bw(snap_box, 0.9);
 figure()
 imshow(snap_box_bw)
 
@@ -76,7 +76,7 @@ Col = 750;
 
 for k = 1:Rows
     for j = 1:Col
-        if(bw_label(k,j) ~= 1)
+        if(bw_label(k,j) ~= 1 || bw_label(k,j) ~= 4)
             bw_label(k,j) = 0;
         end
     end
@@ -88,7 +88,7 @@ max_reg = bw_label;
 
 figure()
 imshow(snap_box);
-title('Highlighted Text and Box')
+title('The Blob, Outlined')
 hold on
 for k = 1:size(B)
    boundary = B{k};
