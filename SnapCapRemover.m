@@ -132,8 +132,6 @@ ro_y = [min_y min_y mid_y max_y max_y mid_y];
 
 testImage_gray = rgb2gray(testImage);
 J = regionfill(testImage_gray,ro_x,ro_y);
-figure
-imshow(J)
 
 testImage_noText = gray2rgb(J);
 
