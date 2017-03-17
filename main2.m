@@ -5,7 +5,7 @@ clc; clear; close all;
 
 %% Project Code 
 % testImage.pic = imread('Simple.JPG');
-testImage = imread('Simple.JPG');
+testImage = imread('desk.jpeg');
 
 imshow(testImage)
 title('Original Image')
@@ -114,6 +114,8 @@ end
 title('Image with isolated text and caption box')
 
 %% Inpaint the text with found values
+
+% create polygon region to fill
 fact = 10;
 max_y = max_y+fact;
 min_y = min_y-fact;
@@ -129,9 +131,17 @@ mid_y = min_y + diff_y;
 ro_x = [min_x max_x right_x max_x min_x left_x]
 ro_y = [min_y min_y mid_y max_y max_y mid_y]
 
-I = rgb2gray(testImage);
-J = regionfill(I,ro_x,ro_y);
+testImage_gray = rgb2gray(testImage);
+J = regionfill(testImage_gray,ro_x,ro_y);
 figure
 imshow(J)
+[x,map] = rgb2ind(testImage,800);
+
+colorMap=[testImage(:,:,1)' testImage(:,:,2)' testImage(:,:,3)'];
+rgbTest = ind2rgb(J,map);
+figure();
+imshow(rgbTest)
 title('Image with text removed')
+
+
 

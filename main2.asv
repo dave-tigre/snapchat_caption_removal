@@ -5,7 +5,7 @@ clc; clear; close all;
 
 %% Project Code 
 % testImage.pic = imread('Simple.JPG');
-testImage = imread('Simple.JPG');
+testImage = imread('desk.jpeg');
 
 imshow(testImage)
 title('Original Image')
@@ -113,26 +113,31 @@ for k = 1:size(B)
 end
 title('Image with isolated text and caption box')
 
-%% Inpaint the text
-% max_y
-% min_y
-% max_x
-% min_x
-diff_x = max_x - min_x;
+%% Inpaint the text with found values
+fact = 10;
+max_y = max_y+fact;
+min_y = min_y-fact;
+max_x = max_x+fact; 
+min_x = min_x-fact;
+diff_x = (max_x - min_x);
 left_x = min_x - diff_x;
-right_x = max_x - diff_x;
+right_x = max_x + diff_x;
 
-ro_x = [min_x-1 min_x-1 left_x max_x+1 max_x+1 right_x];
-ro_y = [min_y-1 max_y+1 ];
+diff_y = (max_y - min_y);
+mid_y = min_y + diff_y;
 
-I = rgb2gray(testImage);
-J = regionfill(I,ro_x,ro_y);
+ro_x = [min_x max_x right_x max_x min_x left_x]
+ro_y = [min_y min_y mid_y max_y max_y mid_y]
+
+testImage_gray = rgb2gray(testImage);
+J = regionfill(testImage_gray,ro_x,ro_y);
 figure
-subplot(1,2,1)
-imshow(I)
-title('Original image')
-subplot(1,2,2)
 imshow(J)
-title('Image with one less coin')
+[x,map] = rgb2ind(testImage,800);
+map
+colorMap=[testImage(:,:,1) testImage(:,:,2) testImage(:,:,3)]
+rgbTest = ind2rgb(J,color)
+title('Image with text removed')
+
 
 
