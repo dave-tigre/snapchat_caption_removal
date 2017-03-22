@@ -15,15 +15,9 @@ testImage_bw = im2bw(testImage, 0.5);
 testImage_bw_edge = edge(testImage_bw,'canny');
 [H,T,R] = hough(testImage_bw_edge);
 
-% imshow(H,[],'XData',T,'YData',R,...
-%             'InitialMagnification','fit');
-% xlabel('\theta'), ylabel('\rho');
-% axis on, axis normal, hold on;
-% 
-% 
+
 P  = houghpeaks(H,5,'threshold',ceil(0.3*max(H(:))));
 x = T(P(:,2)); y = R(P(:,1));
-% plot(x,y,'s','color','white');
 
 
 lines = houghlines(testImage_bw_edge,T,R,P,'FillGap',5,'MinLength',300);
@@ -42,17 +36,6 @@ for k = 1:length(lines)
     xy(1,1) = 0;
    plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
    snaplines_y(length(snaplines_y)+1) = lines(k).point2(2);
-
-   % Plot beginnings and ends of lines
-%    plot(xy(1,1),xy(1,2),'x','LineWidth',2,'Color','yellow');
-%    plot(xy(2,1),xy(2,2),'x','LineWidth',2,'Color','red');
-
-   % Determine the endpoints of the longest line segment
-% %    len = norm(lines(k).point1 - lines(k).point2);
-% %    if ( len > max_len)
-% %       max_len = len;
-% %       xy_long = xy;
-% %    end
 end
 
 hold on
@@ -149,6 +132,7 @@ for i = 1:ROW
             end     
         end
         
+        
     end
 end
 
@@ -181,7 +165,8 @@ G_adj_scale = round(mean(G_adj_scale));
 B_adj_scale = round(mean(B_adj));
 B_adj_scale = round(mean(B_adj_scale));
 
-        
+Y=2.5;
+b=0.9;
 for t = snaplines_y(2):snaplines_y(1)
     if t == snaplines_y(2) || t == snaplines_y(1) % The borders of the bar aren't faded as much
         testImage_adjusted(t,:,1) = testImage_noText(t,:,1) + round(R_adj_scale/2);
@@ -189,9 +174,27 @@ for t = snaplines_y(2):snaplines_y(1)
         testImage_adjusted(t,:,3) = testImage_noText(t,:,3) + round(B_adj_scale/2);
         continue;
     end
-    testImage_adjusted(t,:,1) = testImage_noText(t,:,1) + R_adj_scale;
-    testImage_adjusted(t,:,2) = testImage_noText(t,:,2) + G_adj_scale;
-    testImage_adjusted(t,:,3) = testImage_noText(t,:,3) + B_adj_scale;
+    
+    testImage_adjusted(t,:,1) = testImage_noText(t,:,1)*Y+b; 
+    testImage_adjusted(t,:,2) = testImage_noText(t,:,2)*Y+b; 
+    testImage_adjusted(t,:,3) = testImage_noText(t,:,3)*Y+b; 
+    
+    
+end
+
+e=2.25;
+[ROW COL RGB] = size(testImage);
+for i = 1:ROW
+    for j = 1:COL
+        
+        if (and(i > min_y, i < max_y) && (and(j > left_x, j < right_x)))
+            testImage_adjusted(i,j,1) = testImage_noText(i,j,1) + R_adj_scale*(Y/e);
+            testImage_adjusted(i,j,2) = testImage_noText(i,j,2) + G_adj_scale*(Y/e);
+            testImage_adjusted(i,j,3) = testImage_noText(i,j,3) + B_adj_scale*(Y/e); 
+        end
+        
+        
+    end
 end
 
 figure()
